@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Goodstone — Investor Reporting Workspace Demo</title>
+<style>
+:root{--ink:#102b2a;--deep:#0b2524;--forest:#234a43;--green:#6f8e76;--sage:#b7c5b4;--lime:#dce86d;--sand:#f2eee5;--paper:#fbfaf7;--accent:#e96d4f;--muted:#6b7775;--line:rgba(16,43,42,.14);--blue:#446b8b;--shadow:0 12px 34px rgba(16,43,42,.12)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#e7ebe6;color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select,textarea{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:285px 1fr}
+.sidebar{background:var(--deep);color:white;padding:25px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:auto}
+.wordmark{letter-spacing:.23em;font-size:17px;font-weight:900;margin:2px 5px 28px}.workspace{font-size:11px;color:#aac0bb;text-transform:uppercase;letter-spacing:.13em;margin:0 5px 8px}.fund-name{font-family:Georgia,serif;font-size:22px;line-height:1.15;margin:0 5px 23px}
+.nav{display:grid;gap:5px}.nav button{background:transparent;color:#c7d4d1;border:0;padding:10px 12px;text-align:left;border-radius:8px;cursor:pointer;font-weight:650;font-size:13px}.nav button.active,.nav button:hover{background:rgba(255,255,255,.09);color:white}.nav .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);margin-right:9px}
+.source-card{margin-top:24px;border-top:1px solid rgba(255,255,255,.13);padding-top:19px}.source-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}.source-head b{font-size:12px}.live{font-size:9px;padding:4px 7px;border-radius:99px;background:rgba(220,232,109,.13);color:var(--lime);font-weight:800;letter-spacing:.08em}
+.file{display:grid;grid-template-columns:27px 1fr 10px;gap:8px;align-items:center;padding:8px 5px;border-radius:7px}.file:hover{background:rgba(255,255,255,.06)}.file-icon{height:27px;border-radius:6px;display:grid;place-items:center;background:rgba(255,255,255,.1);font-size:10px;font-weight:800}.file b{display:block;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.file span{display:block;color:#91a6a1;font-size:9px;margin-top:2px}.ok{width:7px;height:7px;border-radius:50%;background:#8fcb91}
+.side-actions{margin-top:auto;display:grid;gap:8px;padding-top:20px}.side-actions button{border:1px solid rgba(255,255,255,.18);background:transparent;color:white;border-radius:9px;padding:10px;cursor:pointer;font-weight:700}.side-actions button:hover{background:white;color:var(--deep)}
+.main{min-width:0}.topbar{height:67px;background:rgba(251,250,247,.95);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 29px;position:sticky;top:0;z-index:8;backdrop-filter:blur(12px)}
+.crumb{font-size:12px;color:var(--muted)}.crumb b{color:var(--ink)}.actions{display:flex;align-items:center;gap:8px}.actions button{border:1px solid var(--line);background:white;color:var(--ink);padding:10px 13px;border-radius:9px;cursor:pointer;font-size:12px;font-weight:750}.actions button:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(16,43,42,.09)}.actions .primary{background:var(--lime);border-color:var(--lime)}.actions .dark{background:var(--deep);color:white;border-color:var(--deep)}
+.content{padding:28px 30px 50px;max-width:1480px;margin:auto}.notice{display:flex;justify-content:space-between;align-items:center;background:#fff5df;border:1px solid #eadbb5;border-radius:10px;padding:10px 13px;font-size:11px;color:#6c5a2f;margin-bottom:15px}.notice b{letter-spacing:.08em}.notice button{border:0;background:transparent;text-decoration:underline;cursor:pointer;color:inherit}
+.report-head{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;margin:5px 0 19px}.kicker{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--green);font-weight:850}.report-head h1{font-family:Georgia,"Times New Roman",serif;font-size:36px;letter-spacing:-.035em;margin:6px 0 6px}.subtitle{color:var(--muted);font-size:13px}.status-box{text-align:right}.status{display:inline-flex;align-items:center;gap:7px;background:white;border:1px solid var(--line);padding:8px 10px;border-radius:999px;font-size:10px;font-weight:800}.status i{width:7px;height:7px;border-radius:50%;background:#8fcb91}.timestamp{font-size:9.5px;color:var(--muted);margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:17px}.kpi{background:white;border:1px solid var(--line);border-radius:11px;padding:15px 16px;box-shadow:0 4px 17px rgba(16,43,42,.035)}.kpi .label{font-size:9.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800}.kpi .value{font-family:Georgia,serif;font-size:27px;margin:8px 0 3px;letter-spacing:-.03em}.delta{font-size:10.5px;color:var(--green)}.delta.warn{color:#a76a2f}
+.grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(310px,.75fr);gap:16px}.panel{background:white;border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 17px rgba(16,43,42,.035);overflow:hidden}.panel-head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-head h2{font-family:Georgia,serif;font-size:19px;margin:0}.panel-head span{font-size:9.5px;color:var(--muted)}
+.narrative{padding:6px 17px 10px}.section{padding:15px 0 14px;border-bottom:1px solid var(--line);position:relative}.section:last-child{border-bottom:0}.section h3{font-size:12px;margin:0 0 7px}.section p{font-size:12.5px;line-height:1.58;margin:0;color:#405351}.sources{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}.tag{font-size:8.5px;background:var(--sand);padding:4px 6px;border-radius:99px;color:#65716f}.ai-tag{background:#edf3d1;color:#57611f;font-weight:800}
+.review-flag{position:absolute;right:0;top:12px;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#7a8583}.editable-on .section p,.editable-on .project-note{outline:2px dashed rgba(233,109,79,.7);outline-offset:4px;background:rgba(233,109,79,.035)}
+.projects{padding:8px 14px 14px}.project{display:grid;grid-template-columns:70px 1fr auto;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}.project:last-child{border:0}.thumb{width:70px;height:54px;object-fit:cover;border-radius:7px}.project h4{font-size:11px;margin:0 0 3px}.project-meta{font-size:9.5px;color:var(--muted)}.progress{height:5px;background:#e8ece7;border-radius:99px;margin-top:7px;overflow:hidden}.progress span{display:block;height:100%;background:var(--green)}.pct{font-family:Georgia,serif;font-size:17px}.project-note{font-size:9.5px;line-height:1.35;color:#516360;margin-top:6px}
+.risk{margin:0 14px 14px;padding:13px;border-radius:9px;background:#f6f1e7}.risk h3{font-size:11px;margin:0 0 8px}.risk-item{display:flex;gap:8px;font-size:10.5px;line-height:1.4;margin:7px 0}.risk-item i{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:0 0 auto;margin-top:4px}.risk-item.low i{background:#8fcb91}
+.flow{margin-top:16px;background:var(--deep);color:white;border-radius:12px;padding:18px}.flow-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.flow h2{font-family:Georgia,serif;font-size:20px;margin:0}.flow-head span{font-size:9px;color:#a8bcb8}.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.step{position:relative;background:rgba(255,255,255,.07);padding:12px;border-radius:8px;min-height:79px}.step:not(:last-child):after{content:'→';position:absolute;right:-9px;top:28px;color:var(--lime);z-index:2}.step b{display:block;font-size:10.5px;margin-bottom:5px}.step span{display:block;color:#a9bbb7;font-size:9px;line-height:1.35}.step.done{background:rgba(220,232,109,.12)}.step.done b{color:var(--lime)}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--deep);color:white;padding:13px 16px;border-radius:10px;box-shadow:var(--shadow);font-size:11px;opacity:0;transform:translateY(15px);pointer-events:none;transition:.25s;z-index:30}.toast.show{opacity:1;transform:translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(8,25,24,.62);display:none;align-items:center;justify-content:center;padding:20px;z-index:25}.modal.open{display:flex}.modal-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--paper);border-radius:14px;box-shadow:0 26px 80px rgba(0,0,0,.35)}.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h2{font-family:Georgia,serif;margin:0;font-size:23px}.close{border:0;background:transparent;font-size:22px;cursor:pointer}.modal-body{padding:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:9.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:800;color:var(--muted)}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:white;border-radius:8px;padding:10px;font-size:12px;color:var(--ink)}.field textarea{min-height:120px;resize:vertical}.security{margin-top:15px;background:#ecf1ea;padding:12px;border-left:4px solid var(--green);font-size:10.5px;line-height:1.45;color:#50615f}.modal-actions{display:flex;justify-content:flex-end;gap:8px;padding:15px 20px;border-top:1px solid var(--line)}.modal-actions button{border:1px solid var(--line);background:white;padding:9px 13px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer}.modal-actions .primary{background:var(--deep);color:white}
+.generator{padding:5px 0}.gen-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.gen-row:last-child{border:0}.spinner{width:23px;height:23px;border-radius:50%;border:3px solid #dfe6df;border-top-color:var(--green);animation:spin .8s linear infinite}.check{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#dcebd9;color:#2d6334;font-weight:900}.gen-row b{font-size:12px;display:block}.gen-row span{font-size:10px;color:var(--muted)}@keyframes spin{to{transform:rotate(360deg)}}
+.diff{background:white;border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:12px}.diff h4{font-size:11px;margin:0 0 8px}.removed{background:#fbe5e0;text-decoration:line-through}.added{background:#e7f0d0}.diff p{font-size:11px;line-height:1.5;margin:5px 0}
+.tab-hidden{display:none!important}.source-map{padding:16px}.source-table{width:100%;border-collapse:collapse;font-size:11px}.source-table th,.source-table td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}.source-table th{font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}.badge{display:inline-block;padding:4px 6px;border-radius:99px;background:#e6efdf;font-size:8.5px;font-weight:800}.badge.warn{background:#fff0d7;color:#94621e}
+@media(max-width:1050px){.app{grid-template-columns:225px 1fr}.kpis{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.step:not(:last-child):after{content:'↓';right:50%;top:auto;bottom:-12px}.sidebar{padding:20px 14px}.fund-name{font-size:18px}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;height:auto}.source-card,.side-actions{display:none}.main{width:100%}.topbar{padding:0 14px}.crumb{display:none}.actions button:not(.primary){display:none}.content{padding:20px 14px 90px}.report-head{grid-template-columns:1fr}.status-box{text-align:left}.kpis{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.project{grid-template-columns:60px 1fr auto}.thumb{width:60px}.notice{align-items:flex-start;gap:10px}}
+@media print{.sidebar,.topbar,.notice,.flow,.review-flag{display:none!important}.app{display:block}.content{padding:0}.grid{grid-template-columns:1.5fr .8fr}.panel{box-shadow:none}.report-head h1{font-size:30px}.kpis{grid-template-columns:repeat(4,1fr)}body{background:white}@page{size:A4 landscape;margin:10mm}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="wordmark">GOODSTONE</div>
+  <div class="workspace">Investor reporting</div>
+  <div class="fund-name">Residential Fund I</div>
+  <nav class="nav">
+    <button class="active" data-tab="report" onclick="showTab('report',this)"><span class="dot"></span>Quarterly report</button>
+    <button data-tab="sources" onclick="showTab('sources',this)">Source map</button>
+    <button onclick="openReview()">Review changes <span id="changeCount" style="float:right;background:#e96d4f;color:white;border-radius:99px;padding:1px 6px;font-size:9px">3</span></button>
+    <button onclick="openSettings()">Automation settings</button>
+  </nav>
+  <section class="source-card">
+    <div class="source-head"><b>Google Drive sources</b><span class="live">CONNECTED</span></div>
+    <div class="file"><div class="file-icon">XLS</div><div><b>Fund_Model_Q2.xlsx</b><span>Finance · 11:38</span></div><i class="ok"></i></div>
+    <div class="file"><div class="file-icon">CSV</div><div><b>Development_Tracker.csv</b><span>Development · 11:37</span></div><i class="ok"></i></div>
+    <div class="file"><div class="file-icon">GS</div><div><b>Leasing_Dashboard</b><span>Operations · 11:36</span></div><i class="ok"></i></div>
+    <div class="file"><div class="file-icon">XLS</div><div><b>ESG_Databook.xlsx</b><span>Sustainability · 11:35</span></div><i class="ok"></i></div>
+    <div class="file"><div class="file-icon">DOC</div><div><b>Management_Notes.docx</b><span>Asset management · 11:32</span></div><i class="ok"></i></div>
+  </section>
+  <div class="side-actions"><button onclick="syncDrive()">↻ Sync Drive</button><button onclick="document.getElementById('fileInput').click()">＋ Upload source file</button><input id="fileInput" type="file" hidden accept=".csv,.json,.txt" onchange="handleFile(this.files[0])"></div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><b>Residential Fund I</b> / Investor reporting / Q2 2026</div>
+    <div class="actions">
+      <select id="period" onchange="changePeriod()" style="border:1px solid var(--line);background:white;padding:10px;border-radius:9px;font-size:12px"><option>Q2 2026</option><option>Q1 2026</option><option>FY 2025</option></select>
+      <button onclick="toggleEdit()" id="editButton">Edit report</button>
+      <button onclick="window.print()">Export PDF</button>
+      <button class="primary" onclick="generateReport()">✦ Generate report</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="notice"><span><b>ILLUSTRATIVE PROTOTYPE</b> — portfolio names and publicly available unit counts are used for context; financial and operating values are fictional demo data.</span><button onclick="this.parentElement.remove()">Dismiss</button></div>
+
+    <section id="reportTab">
+      <div class="report-head">
+        <div><div class="kicker">Quarterly investor report · <span id="periodLabel">Q2 2026</span></div><h1>Goodstone Living Residential Fund I</h1><div class="subtitle">Investment, development, operating and sustainability update</div></div>
+        <div class="status-box"><div class="status"><i></i><span id="statusText">Ready for review</span></div><div class="timestamp" id="timestamp">Generated today at 11:42 · 5 sources</div></div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="label">Portfolio homes</div><div class="value" id="homes">1,283</div><div class="delta">3 UK communities</div></div>
+        <div class="kpi"><div class="label">Illustrative GAV</div><div class="value" id="gav">£710m</div><div class="delta">+2.1% quarter-on-quarter</div></div>
+        <div class="kpi"><div class="label">Forecast gross IRR</div><div class="value" id="irr">12.4%</div><div class="delta">+30 bps vs. business plan</div></div>
+        <div class="kpi"><div class="label">Stabilised occupancy</div><div class="value" id="occupancy">94.8%</div><div class="delta warn">-40 bps vs. prior quarter</div></div>
+      </div>
+
+      <div class="grid">
+        <section class="panel" id="narrativePanel">
+          <div class="panel-head"><h2>Investor commentary</h2><span>AI drafted · human approved</span></div>
+          <div class="narrative">
+            <article class="section"><span class="review-flag">Approved</span><h3>Executive summary</h3><p contenteditable="false">The portfolio continued to progress broadly in line with the business plan during the quarter. Development activity advanced across Smith’s Garden and Dagenham Green, while the completed Edinburgh community moved further into its operational phase. The illustrative valuation and return outlook improved modestly, supported by construction progress and resilient demand, partly offset by near-term leasing costs.</p><div class="sources"><span class="tag ai-tag">AI generated</span><span class="tag">Fund_Model_Q2.xlsx</span><span class="tag">Management_Notes.docx</span></div></article>
+            <article class="section"><span class="review-flag">Review</span><h3>Development and delivery</h3><p contenteditable="false">Smith’s Garden reached an illustrative 72% completion during the quarter, with the critical path remaining focused on façade completion and internal fit-out. Dagenham Green progressed to 38%, with the principal structure moving in line with the revised programme. No material new health and safety issues were recorded in the demo dataset.</p><div class="sources"><span class="tag ai-tag">AI generated</span><span class="tag">Development_Tracker.csv</span></div></article>
+            <article class="section"><span class="review-flag">Approved</span><h3>Operations and leasing</h3><p contenteditable="false">Operational performance remained resilient, with illustrative stabilised occupancy of 94.8%. Enquiry volumes strengthened toward the end of the quarter; however, incentives were temporarily above plan as the team tested pricing and channel mix. Resident satisfaction and service-response measures remained within the agreed operating range.</p><div class="sources"><span class="tag ai-tag">AI generated</span><span class="tag">Leasing_Dashboard</span></div></article>
+            <article class="section"><span class="review-flag">Approved</span><h3>Sustainability and social value</h3><p contenteditable="false">The quarter’s sustainability programme remained focused on operational carbon, embodied carbon monitoring and local social value delivery. The reporting workflow has flagged two metrics awaiting final evidence before external publication, allowing the narrative to be prepared without presenting unverified data.</p><div class="sources"><span class="tag ai-tag">AI generated</span><span class="tag">ESG_DataBook.xlsx</span><span class="tag">2 checks pending</span></div></article>
+            <article class="section"><span class="review-flag">Review</span><h3>Outlook</h3><p contenteditable="false">The next quarter will focus on protecting the development programmes, maintaining leasing momentum and closing the outstanding sustainability evidence items. The illustrative return outlook remains within the target range, with construction delivery, financing conditions and lease-up velocity continuing to be the main sensitivities.</p><div class="sources"><span class="tag ai-tag">AI generated</span><span class="tag">Fund_Model_Q2.xlsx</span><span class="tag">Management_Notes.docx</span></div></article>
+          </div>
+        </section>
+
+        <aside>
+          <section class="panel">
+            <div class="panel-head"><h2>Project progress</h2><span>Illustrative</span></div>
+            <div class="projects">
+              <article class="project"><img class="thumb" src="assets/goodstone-dockside.jpg" alt="Dockside"><div><h4>Dockside · Edinburgh</h4><div class="project-meta">373 homes · operational</div><div class="progress"><span style="width:100%"></span></div><div class="project-note" contenteditable="false">Completion transition and operational mobilisation.</div></div><div class="pct">100%</div></article>
+              <article class="project"><img class="thumb" src="assets/goodstone-smiths-garden.jpg" alt="Smith's Garden"><div><h4>Smith’s Garden · Birmingham</h4><div class="project-meta">550 homes · development</div><div class="progress"><span style="width:72%"></span></div><div class="project-note" contenteditable="false">Façade and internal fit-out remain on the critical path.</div></div><div class="pct">72%</div></article>
+              <article class="project"><img class="thumb" src="assets/goodstone-dagenham-green.jpg" alt="Dagenham Green"><div><h4>Dagenham Green · London</h4><div class="project-meta">360 homes · development</div><div class="progress"><span style="width:38%"></span></div><div class="project-note" contenteditable="false">Structure advancing in line with the revised programme.</div></div><div class="pct">38%</div></article>
+            </div>
+            <div class="risk"><h3>Key review items</h3><div class="risk-item"><i></i><span>Confirm final embodied-carbon evidence before publication.</span></div><div class="risk-item"><i></i><span>Review incentive assumptions against current leasing velocity.</span></div><div class="risk-item low"><i></i><span>No material data-integrity exceptions in the fund model.</span></div></div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="flow">
+        <div class="flow-head"><h2>What happens when “Generate report” is pressed</h2><span>Proposed production workflow</span></div>
+        <div class="steps"><div class="step done"><b>1. Refresh sources</b><span>Pull the latest approved files from Google Drive and Sheets.</span></div><div class="step done"><b>2. Validate data</b><span>Check period, totals, missing fields and unusual movements.</span></div><div class="step done"><b>3. Build metrics</b><span>Populate the agreed reporting data model and project tables.</span></div><div class="step done"><b>4. Draft narrative</b><span>Send approved metrics and prompts to Claude or ChatGPT.</span></div><div class="step done"><b>5. Review and export</b><span>Edit, approve, preserve sources and create the final output.</span></div></div>
+      </section>
+    </section>
+
+    <section id="sourcesTab" class="tab-hidden">
+      <div class="report-head"><div><div class="kicker">Connected reporting model</div><h1>Source map and controls</h1><div class="subtitle">Every output is mapped back to an owned source, validation rule and review status.</div></div></div>
+      <div class="panel"><div class="panel-head"><h2>Data-source register</h2><span>Last synced 11:38</span></div><div class="source-map"><table class="source-table"><thead><tr><th>Source</th><th>Owner</th><th>Used for</th><th>Refresh</th><th>Status</th></tr></thead><tbody><tr><td>Fund_Model_Q2.xlsx</td><td>Fund finance</td><td>GAV, returns, capital, sensitivities</td><td>Quarterly</td><td><span class="badge">Validated</span></td></tr><tr><td>Development_Tracker.csv</td><td>Development</td><td>Programme, cost, completion, risks</td><td>Monthly</td><td><span class="badge">Validated</span></td></tr><tr><td>Leasing_Dashboard</td><td>Operations</td><td>Occupancy, pricing, incentives, NPS</td><td>Weekly</td><td><span class="badge">Validated</span></td></tr><tr><td>ESG_DataBook.xlsx</td><td>Sustainability</td><td>Carbon, energy, social value</td><td>Quarterly</td><td><span class="badge warn">2 checks</span></td></tr><tr><td>Management_Notes.docx</td><td>Asset management</td><td>Context, outlook, exceptions</td><td>Quarterly</td><td><span class="badge">Loaded</span></td></tr></tbody></table></div></div>
+      <div class="flow"><div class="flow-head"><h2>Control principles</h2><span>Designed for investor-grade use</span></div><div class="steps"><div class="step"><b>Source ownership</b><span>Each metric has a named owner and approved file location.</span></div><div class="step"><b>Validation</b><span>Hard checks before any narrative is generated.</span></div><div class="step"><b>Prompt control</b><span>Versioned instructions and report-specific language.</span></div><div class="step"><b>Human approval</b><span>No investor output is released without review.</span></div><div class="step"><b>Audit trail</b><span>Inputs, outputs, edits and approvals are retained.</span></div></div></div>
+    </section>
+  </div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="settingsModal"><div class="modal-card"><div class="modal-head"><h2>Automation settings</h2><button class="close" onclick="closeModal('settingsModal')">×</button></div><div class="modal-body"><div class="form-grid"><div class="field"><label>AI provider</label><select id="provider"><option>Anthropic · Claude</option><option>OpenAI · ChatGPT</option></select></div><div class="field"><label>Report template</label><select><option>Quarterly investor report</option><option>Monthly management update</option><option>IC portfolio update</option></select></div><div class="field full"><label>Google Drive folder</label><input value="Goodstone / Investor Reporting / Residential Fund I" /></div><div class="field"><label>Model</label><select><option>Claude Sonnet</option><option>Claude Opus</option><option>GPT enterprise model</option></select></div><div class="field"><label>Review owner</label><input value="Fund Management Team" /></div><div class="field full"><label>Core commentary instruction</label><textarea>Draft concise institutional investor commentary using only the validated metrics and management notes provided. Explain material changes, distinguish fact from judgement, flag missing evidence and never invent a number. Preserve Goodstone's tone: clear, measured and outcome-focused.</textarea></div></div><div class="security"><b>Production design:</b> Google credentials and AI API keys would sit in a secure backend (for example Google Cloud Run, Apps Script or an approved internal environment), not inside this browser file. The front end sends a generation request and receives the validated report output.</div></div><div class="modal-actions"><button onclick="closeModal('settingsModal')">Cancel</button><button class="primary" onclick="saveSettings()">Save settings</button></div></div></div>
+
+<div class="modal" id="generateModal"><div class="modal-card"><div class="modal-head"><h2>Generating investor report</h2><button class="close" onclick="closeModal('generateModal')">×</button></div><div class="modal-body"><div class="generator" id="generatorSteps"></div></div></div></div>
+
+<div class="modal" id="reviewModal"><div class="modal-card"><div class="modal-head"><h2>Review suggested changes</h2><button class="close" onclick="closeModal('reviewModal')">×</button></div><div class="modal-body"><p style="font-size:12px;color:var(--muted);line-height:1.5">The workflow highlights material changes from the prior approved version rather than forcing the reviewer to reread the full report.</p><div class="diff"><h4>Executive summary</h4><p><span class="removed">Development activity remained fully on programme.</span></p><p><span class="added">Development activity advanced across both live schemes, with minor programme pressure isolated to façade sequencing.</span></p></div><div class="diff"><h4>Operations and leasing</h4><p><span class="added">Illustrative occupancy softened by 40 bps, while enquiry volumes strengthened late in the quarter.</span></p></div><div class="diff"><h4>Sustainability</h4><p><span class="added">Two metrics remain subject to final evidence and are excluded from external claims.</span></p></div></div><div class="modal-actions"><button onclick="closeModal('reviewModal')">Keep reviewing</button><button class="primary" onclick="approveChanges()">Approve all changes</button></div></div></div>
+
+<script>
+let editing=false;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+function openSettings(){document.getElementById('settingsModal').classList.add('open')}
+function openReview(){document.getElementById('reviewModal').classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function saveSettings(){closeModal('settingsModal');toast('Automation settings saved')}
+function approveChanges(){closeModal('reviewModal');document.getElementById('changeCount').textContent='0';document.querySelectorAll('.review-flag').forEach(x=>x.textContent='Approved');toast('All suggested changes approved')}
+function toggleEdit(){editing=!editing;document.getElementById('narrativePanel').classList.toggle('editable-on',editing);document.querySelectorAll('.section p,.project-note').forEach(x=>x.contentEditable=editing?'true':'false');document.getElementById('editButton').textContent=editing?'Finish editing':'Edit report';toast(editing?'Editing enabled — click into any narrative section':'Edits saved in this draft')}
+function showTab(tab,button){document.getElementById('reportTab').classList.toggle('tab-hidden',tab!=='report');document.getElementById('sourcesTab').classList.toggle('tab-hidden',tab!=='sources');document.querySelectorAll('.nav button[data-tab]').forEach(x=>x.classList.remove('active'));button.classList.add('active')}
+function syncDrive(){toast('Google Drive synced · 5 sources refreshed');document.getElementById('timestamp').textContent='Sources refreshed just now · 5 sources'}
+function handleFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{toast(file.name+' loaded into the demo workspace');document.getElementById('timestamp').textContent='Source file added just now · 6 sources'};reader.readAsText(file)}
+function changePeriod(){const p=document.getElementById('period').value;document.getElementById('periodLabel').textContent=p;toast('Reporting period changed to '+p)}
+async function generateReport(){
+ const modal=document.getElementById('generateModal'), box=document.getElementById('generatorSteps');
+ modal.classList.add('open');box.innerHTML='';
+ const items=[['Refreshing Google Drive sources','5 approved files located'],['Running validation checks','Period, totals and movement checks'],['Building reporting metrics','Fund, project, operating and ESG data'],['Drafting commentary','Using '+document.getElementById('provider').value],['Preparing review version','Sources and changes attached']];
+ for(let i=0;i<items.length;i++){
+   const row=document.createElement('div');row.className='gen-row';row.innerHTML='<div class="spinner"></div><div><b>'+items[i][0]+'</b><span>'+items[i][1]+'</span></div>';box.appendChild(row);
+   await new Promise(r=>setTimeout(r,620));row.querySelector('.spinner').className='check';row.querySelector('.check').textContent='✓';
+ }
+ await new Promise(r=>setTimeout(r,300));modal.classList.remove('open');
+ document.getElementById('statusText').textContent='New draft ready';document.getElementById('timestamp').textContent='Generated just now · 5 sources';
+ document.getElementById('gav').textContent='£712m';document.getElementById('irr').textContent='12.5%';document.getElementById('occupancy').textContent='95.0%';
+ document.getElementById('changeCount').textContent='3';toast('New investor report generated and ready for review');
+}
+window.addEventListener('click',e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('open')})
+</script>
+</body>
+</html>
